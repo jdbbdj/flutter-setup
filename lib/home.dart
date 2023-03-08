@@ -182,7 +182,9 @@ class Home extends StatelessWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (BuildContext context) {
-                      return const Blog();
+                      return const Blog(
+                          title: "How to get started?",
+                          imagePath: "images/departing.svg");
                     },
                   ),
                 );
@@ -220,7 +222,9 @@ class Home extends StatelessWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (BuildContext context) {
-                      return const Blog();
+                      return const Blog(
+                          title: "What to do during trip?",
+                          imagePath: "images/boat.svg");
                     },
                   ),
                 );
@@ -258,7 +262,10 @@ class Home extends StatelessWidget {
                 Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (BuildContext context) {
-                      return const Blog();
+                      return const Blog(
+                        title: "How to start your iteninary?",
+                        imagePath: "images/on-the-spot.svg",
+                      );
                     },
                   ),
                 );
