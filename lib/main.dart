@@ -71,7 +71,7 @@ class Login extends StatelessWidget {
             const SizedBox(height: 44.0),
             ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).push(
+                  Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (BuildContext context) {
                         return const Home();
