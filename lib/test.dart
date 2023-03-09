@@ -15,7 +15,7 @@ class _CityPageState extends State<CityPage> {
   bool isError = false;
   bool isLoading = false;
   final cityName = "City";
-  String? d;
+  String d = "";
   final TextEditingController _cityController = TextEditingController();
 
   @override
@@ -47,8 +47,7 @@ class _CityPageState extends State<CityPage> {
                       try {
                         var response = await http.post(
                             Uri.parse("https://mybackend/cities"),
-                            body: '{"city_name":"name"}'
-                                .replaceAll("name", _cityController.text),
+                            body: '{"city_name":${_cityController.text}}',
                             headers: {
                               "Authorization":
                                   "${(await SharedPreferences.getInstance()).getString("TOKEN")}"
@@ -64,6 +63,7 @@ class _CityPageState extends State<CityPage> {
                         setState(() {
                           isError = true;
                         });
+                        d = "";
                         print("Error: $e");
                         rethrow;
                       }
