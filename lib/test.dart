@@ -1,9 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
 class CityPage extends StatefulWidget {
   const CityPage({Key? key}) : super(key: key);
   @override
@@ -11,17 +5,17 @@ class CityPage extends StatefulWidget {
 }
 
 class _CityPageState extends State<CityPage> {
-  bool isError = false;
-  bool isLoading = false;
-  final cityName = "City";
+  bool? hasError;
+  var _l = true;
+  final _N = "City";
   String? d;
-  final TextEditingController _cityController = TextEditingController();
+  TextEditingController _cityController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
+        title: Center(
           child: Text(
             "Weather Page",
           ),
@@ -31,44 +25,25 @@ class _CityPageState extends State<CityPage> {
         children: [
           Row(
             children: [
-              Expanded(
+              Container(
                 child: TextField(
                   controller: _cityController,
-                  decoration: InputDecoration(hintText: "Enter $cityName name"),
+                  decoration: InputDecoration(hintText: "Enter $_N name"),
                 ),
               ),
               ElevatedButton(
-                  onPressed: () async {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    Future.delayed(Duration(milliseconds: 3000), () async {
-                      try {
-                        var response = await http.post(
-                            Uri.parse("https://mybackend/cities"),
-                            body: '{"city_name":"name"}'
-                                .replaceAll("name", _cityController.text),
-                            headers: {
-                              "Authorization":
-                                  "${(await SharedPreferences.getInstance()).getString("TOKEN")}"
-                            });
-                        setState(() {
-                          isLoading = false;
-                        });
-                        d = response.body;
-                      } catch (e) {
-                        setState(() {
-                          isLoading = false;
-                        });
-                        setState(() {
-                          isError = true;
-                        });
-                        print("Error: $e");
-                        rethrow;
-                      }
-                    });
-                  },
-                  child: const Text("Generate")),
+                onPressed: () async {
+                  post("https://mybackend/cities",
+                      body: '{"city_name":"name"}'
+                          .replaceAll("name", _cityController.text),
+                      headers: {
+                        "Authorization": (await SharedPreferences.getInstance())
+                            .getString("TOKEN")
+                      }).then((resp) {
+                    d = resp.body;
+                  });
+                },
+              )
             ],
           ),
           buildBody(context)
@@ -78,49 +53,76 @@ class _CityPageState extends State<CityPage> {
   }
 
   Widget buildBody(BuildContext context) {
-    return isLoading
-        ? const Center(
-            child: CircularProgressIndicator(),
+    String rg = '"(weather)":"((\\"|[^"])*)"';
+    String w = RegExp(rg).firstMatch(d).group(2);
+    return _l
+        ? Container(
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
           )
-        : Card(
-            child: Column(
-              children: [
-                Text("MANILA"),
-                RichText(
-                  text: TextSpan(children: [
-                    TextSpan(
-                      text: "HISTORY",
-                    ),
-                    TextSpan(
-                      text: "TEXT",
-                    ),
-                  ]),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(vertical: 20.0),
-                  height: 180.0,
-                  child: SvgPicture.asset(
-                    'images/departing.svg',
-                    width: 180,
-                  ),
-                ),
-                Row(
+        : hasError
+            ? Container()
+            : Card(
+                child: Column(
                   children: [
-                    Column(
-                      children: [Text("Temperature:"), Text("100*")],
+                    Container(
+                      child: Text(
+                          "City:${RegExp('"(name)":"((\\"|[^"])*)"').firstMatch(d).group(2)}"),
                     ),
                     Container(
-                      height: 20.0,
-                      decoration:
-                          BoxDecoration(border: Border(right: BorderSide())),
+                      child: RichText(
+                        text: TextSpan(children: [
+                          TextSpan(
+                            text: "History:\n",
+                          ),
+                          TextSpan(
+                            text: RegExp('"(name)":"((\\"|[^"])*)"')
+                                .firstMatch(d)
+                                .group(2),
+                          ),
+                        ]),
+                      ),
                     ),
-                    Column(
-                      children: [Text("Unit:"), Text("123")],
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 20.0),
+                      height: 750.0,
+                      child: Image.network(
+                        RegExp('"(image_url)":"((\\"|[^"])*)"')
+                            .firstMatch(d)
+                            .group(2),
+                        fit: BoxFit.fill,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Container(
+                          child: Column(
+                            children: [
+                              Text("Temperature:"),
+                              Text(
+                                  "${RegExp('"(temp)":"((\\"|[^"])*)"').firstMatch(w).group(2)}")
+                            ],
+                          ),
+                        ),
+                        Container(
+                          height: 20.0,
+                          decoration: BoxDecoration(
+                              border: Border(right: BorderSide())),
+                        ),
+                        Container(
+                          child: Column(
+                            children: [
+                              Text("Unit:"),
+                              Text(
+                                  "${RegExp('"(unit)":"((\\"|[^"])*)"').firstMatch(w).group(2)}")
+                            ],
+                          ),
+                        )
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
-          );
+              );
   }
 }
