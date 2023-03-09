@@ -6,7 +6,10 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/cupertino.dart';
 
 class CityPage extends StatefulWidget {
-  const CityPage({Key? key}) : super(key: key);
+  final String imagePath;
+  final String title;
+  const CityPage(this.imagePath, this.title, {super.key});
+
   @override
   State<CityPage> createState() => _CityPageState();
 }
@@ -39,10 +42,8 @@ class _CityPageState extends State<CityPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Text(
-            "Weather Page",
-          ),
+        title: Center(
+          child: Text(widget.title),
         ),
       ),
       body: Padding(
@@ -148,7 +149,7 @@ class _CityPageState extends State<CityPage> {
                     padding: EdgeInsets.symmetric(vertical: 20.0),
                     height: 180.0,
                     child: SvgPicture.asset(
-                      'images/departing.svg',
+                      widget.imagePath,
                       width: 180,
                     ),
                   ),

@@ -47,10 +47,10 @@ class Blog extends StatelessWidget {
                 ),
                 ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pushReplacement(
+                      Navigator.of(context).push(
                         MaterialPageRoute(
                           builder: (BuildContext context) {
-                            return const CityPage();
+                            return CityPage(imagePath, title);
                           },
                         ),
                       );
